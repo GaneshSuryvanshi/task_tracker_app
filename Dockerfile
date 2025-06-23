@@ -9,6 +9,16 @@ RUN npm run build
 # Stage 2: Set up FastAPI backend
 FROM python:3.11-slim
 WORKDIR /app
+
+# Install system dependencies for building Python packages
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    gcc \
+    libffi-dev \
+    libssl-dev \
+    default-libmysqlclient-dev \
+    && rm -rf /var/lib/apt/lists/*
+    
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 COPY backend/ ./backend
