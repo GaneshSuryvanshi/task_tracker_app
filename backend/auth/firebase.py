@@ -1,10 +1,15 @@
 import os
+import json
 import firebase_admin
 from firebase_admin import credentials, auth
 
-# Dynamically get the path to the JSON file in the same directory as this script
-json_path = os.path.join(os.path.dirname(__file__), 'fsd-task-tracker-app-firebase-adminsdk-fbsvc-25b77c8307.json')
-cred = credentials.Certificate(json_path)
+# Read credentials from environment variable (JSON string)
+firebase_cred_json = os.getenv("FIREBASE_CRED_JSON")
+
+if firebase_cred_json is None:
+    raise ValueError("Missing FIREBASE_CRED_JSON environment variable")
+
+cred = credentials.Certificate(json.loads(firebase_cred_json))
 firebase_admin.initialize_app(cred)
 
 def verify_firebase_token(token: str):
