@@ -27,4 +27,7 @@ COPY backend/ ./backend
 COPY --from=frontend-builder /app/frontend/dist ./frontend_build
 COPY start.py ./
 EXPOSE 8000
+
+RUN ls -l /app
+
 CMD ["python", "start.py"]
