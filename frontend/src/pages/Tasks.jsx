@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useLoggedInUser } from '../store/LoggedInUserContext';
 import { useLocation } from 'react-router-dom';
+
+const BACKEND_HOST = import.meta.env.VITE_BACKEND_HOST;
 const statusOptions = ['new', 'in-progress', 'blocked', 'completed', 'not started'];
 
 const Tasks = ({ projects, users, tasks, setTasks }) => {
@@ -47,7 +49,7 @@ const initialProject = params.get("project") || "";
     const payload = { ...formData, owner_id: formData.owner };
 
     if (editId !== null) {
-      fetch(`http://localhost:8000/tasks/${editId}`, {
+      fetch(`${BACKEND_HOST}/tasks/${editId}/`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
@@ -60,7 +62,7 @@ const initialProject = params.get("project") || "";
           resetForm();
         });
     } else {
-      fetch('http://localhost:8000/tasks/', {
+      fetch(`${BACKEND_HOST}/tasks/`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
@@ -94,7 +96,7 @@ const initialProject = params.get("project") || "";
   const handleDelete = (id) => {
     if (!window.confirm("Are you sure you want to delete this task?")) return;
 
-    fetch(`http://localhost:8000/tasks/${id}`, {
+    fetch(`${BACKEND_HOST}/tasks/${id}/`, {
       method: 'DELETE'
     })
       .then(() => {

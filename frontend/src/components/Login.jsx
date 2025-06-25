@@ -4,6 +4,8 @@ import { useLoggedInUser } from "../store/LoggedInUserContext";
 import { auth } from "../firebase"; // <-- import your firebase config
 import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 
+const BACKEND_HOST = import.meta.env.VITE_BACKEND_HOST;
+console.log("Backend host:", BACKEND_HOST);
 function Login() {
   const [form, setForm] = useState({ email: "", password: "" });
   const [error, setError] = useState("");
@@ -16,11 +18,12 @@ function Login() {
     e.preventDefault();
     setError("");
     console.log("Form submitted:", JSON.stringify(form));
-    const res = await fetch("http://localhost:8000/users/login", {
+    const res = await fetch(`${BACKEND_HOST}/users/login/`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(form),
     });
+    console.log("Login response:", res);
     if (res.ok) {
       const user = await res.json();
       setUser(user);
@@ -29,46 +32,48 @@ function Login() {
     } else {
       setError("Invalid credentials");
     }
+    
   };
 
   // --- Google SSO handler ---
   const handleGoogleLogin = async () => {
-  setError("");
-  const provider = new GoogleAuthProvider();
-  try {
-       const result = await signInWithPopup(auth, provider);
-    const email = result.user.email;
-    const name = result.user.displayName;
-    const idToken = await result.user.getIdToken();
+    setError("");
+    const provider = new GoogleAuthProvider();
+    try {
+      const result = await signInWithPopup(auth, provider);
+      const email = result.user.email;
+      const name = result.user.displayName;
+      const idToken = await result.user.getIdToken();
 
-    // Calling backend API with email and token
-    const res = await fetch("http://localhost:8000/users/get_role", {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${idToken}` // <-- send token in header
-      },
-    });
+      // Calling backend API with email and token
+      const res = await fetch(`${BACKEND_HOST}/users/get_role`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${idToken}` // <-- send token in header
+        },
+      });
 
-   if (res.ok) {
-      const { role, id } = await res.json();
-      // Set user info: id is empty, name/email from SSO, role from backend
-      const user = {
-        id: id || "", // Use id from backend if available
-        name,
-        email,
-        role
-      };
-      setUser(user);
-      localStorage.setItem("user", JSON.stringify(user));
-      navigate("/");
-    } else {
-      setError("User not found in system. Please contact admin.");
+      if (res.ok) {
+        const { role, id } = await res.json();
+        // Set user info: id is empty, name/email from SSO, role from backend
+        const user = {
+          id: id || "", // Use id from backend if available
+          name,
+          email,
+          role
+        };
+        setUser(user);
+        localStorage.setItem("user", JSON.stringify(user));
+        navigate("/");
+      } else {
+        setError("User not found in system. Please contact admin.");
+      }
+    } catch (err) {
+      setError("Google SSO failed: " + err.message);
+      console.error("Google SSO error:", err);
     }
-  } catch (err) {
-    setError("Google SSO failed: " + err.message);
-  }
-};
+  };
   return (
   <div className="flex items-center justify-center min-h-screen bg-gray-100">
     <div className="w-full max-w-xs">

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 
 import { useLoggedInUser } from '../store/LoggedInUserContext';
-
+const BACKEND_HOST = import.meta.env.VITE_BACKEND_HOST;
 const Users = ({ users, setUsers }) => {
   const [formData, setFormData] = useState({
     name: '',
@@ -18,7 +18,7 @@ const Users = ({ users, setUsers }) => {
   console.log('Logged in user:', Loggeduser);
 
   useEffect(() => {
-    fetch('http://localhost:8000/roles')
+    fetch(`${BACKEND_HOST}/roles/`)
       .then(response => response.json())
       .then(data => {
         const roleDict = {};
@@ -55,7 +55,7 @@ const Users = ({ users, setUsers }) => {
        if (!formData.password) {
       delete formData.password;
     }
-      fetch(`http://localhost:8000/users/${editId}`, {
+      fetch(`${BACKEND_HOST}/users/${editId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)
@@ -66,7 +66,7 @@ const Users = ({ users, setUsers }) => {
           resetForm();
         });
     } else {
-      fetch('http://localhost:8000/users', {
+      fetch(`${BACKEND_HOST}/users/`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)
@@ -100,7 +100,7 @@ const Users = ({ users, setUsers }) => {
   const handleDelete = id => {
     if (!window.confirm('Are you sure you want to delete this user?')) return;
 
-    fetch(`http://localhost:8000/users/${id}`, {
+    fetch(`${BACKEND_HOST}/users/${id}/`, {
       method: 'DELETE'
     }).then(() => {
       setUsers(users.filter(u => u.id !== id));

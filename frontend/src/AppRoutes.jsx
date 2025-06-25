@@ -9,6 +9,8 @@ import Tasks from "./pages/Tasks";
 import Users from "./pages/Users";
 import Login from "./components/Login";
 import RequireAuth from "./components/RequireAuth";
+const BACKEND_HOST = import.meta.env.VITE_BACKEND_HOST;
+console.log("Backend host:", BACKEND_HOST);
 
 function AppRoutes() {
     const { user: loggedInUser } = useLoggedInUser();
@@ -18,9 +20,9 @@ function AppRoutes() {
 
     useEffect(() => {
         Promise.all([
-            fetch('http://localhost:8000/users').then(res => res.json()),
-            fetch('http://localhost:8000/projects').then(res => res.json()),
-            fetch('http://localhost:8000/tasks').then(res => res.json())
+            fetch(`${BACKEND_HOST}/users/`).then(res => res.json()),
+            fetch(`${BACKEND_HOST}/projects/`).then(res => res.json()),
+            fetch(`${BACKEND_HOST}/tasks/`).then(res => res.json())
         ])
             .then(([users, projects, tasks]) => {
                 setUsers(users);
