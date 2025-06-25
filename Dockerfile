@@ -24,10 +24,10 @@ RUN apt-get update && apt-get install -y \
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 COPY backend/ ./backend
-#OPY --from=frontend-builder /app/frontend/dist ./frontend_build
-COPY start.py ./
+#COPY --from=frontend-builder /app/frontend/dist ./frontend_build
+
 EXPOSE 8000
 
 RUN ls -l /app
 
-CMD ["python", "start.py"]
+CMD ["python", "backend/start.py"]

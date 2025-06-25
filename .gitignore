@@ -13,3 +13,6 @@ frontend/.env
 
 # Environment files
 .env
+
+venv/
+database_url.bat
