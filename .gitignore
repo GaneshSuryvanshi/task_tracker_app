@@ -16,3 +16,4 @@ frontend/.env
 
 venv/
 database_url.bat
+

@@ -3,6 +3,9 @@ from sqlalchemy.orm import Session
 from database import SessionLocal
 import models, schemas
 from auth.firebase import verify_firebase_token
+import logging
+
+logging.basicConfig(level=logging.INFO)
 
 router = APIRouter(prefix="/users", tags=["users"])
 
@@ -18,26 +21,35 @@ def get_db():
 
 @router.get("/get_role")
 def get_role(authorization: str = Header(...), db: Session = Depends(get_db)):
+    logging.info("/users/get_role endpoint called.")
     # Expecting header: Authorization: Bearer <firebase_token>
     if not authorization.startswith("Bearer "):
+        logging.warning("Invalid authorization header format.")
         raise HTTPException(status_code=401, detail="Invalid authorization header")
     token = authorization.split(" ")[1]
     decoded = verify_firebase_token(token)
     if not decoded:
+        logging.warning("Invalid Firebase token.")
         raise HTTPException(status_code=401, detail="Invalid Firebase token")
     email = decoded.get("email")
     if not email:
+        logging.warning("Email not found in token.")
         raise HTTPException(status_code=400, detail="Email not found in token")
     db_user = db.query(models.User).filter(models.User.email == email).first()
     if not db_user or not db_user.role:
+        logging.warning("User or role not found for email: %s", email)
         raise HTTPException(status_code=404, detail="User or role not found")
+    logging.info(f"User {db_user.email} has role {db_user.role.name}")
     return {"role": db_user.role.name,"id": db_user.id }
 
 @router.post("/login", response_model=schemas.UserLoginResponse)
 def login(user: schemas.UserLogin, db: Session = Depends(get_db)):
+    logging.info(f"Login attempt for user: {user.email}")
     db_user = db.query(models.User).filter(models.User.email == user.email).first()
     if not db_user or db_user.password != user.password:
+        logging.warning(f"Failed login for user: {user.email}")
         raise HTTPException(status_code=401, detail="Invalid credentials")
+    logging.info(f"User {user.email} logged in successfully.")
     return {
         "id": db_user.id,
         "name": db_user.name,
