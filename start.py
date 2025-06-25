@@ -3,7 +3,7 @@ from fastapi.responses import FileResponse
 import uvicorn
 
 from backend.main import app  # Import the FastAPI app from main.py
-
+print("Starting FastAPI app...")
 # Mount React static files
 #app.mount("/static", StaticFiles(directory="frontend_build/static"), name="static")
 
