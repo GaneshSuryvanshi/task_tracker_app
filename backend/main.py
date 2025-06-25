@@ -10,6 +10,18 @@ async def lifespan(app: FastAPI):
     # Startup code
     Base.metadata.create_all(bind=engine)
     db = SessionLocal()
+    # Add roles if not present
+    roles = [
+        {"id": 1, "name": "admin"},
+        {"id": 2, "name": "task_creator"},
+        {"id": 3, "name": "user"}
+    ]
+    for role in roles:
+        db_role = db.query(models.Role).filter_by(id=role["id"]).first()
+        if not db_role:
+            db.add(models.Role(id=role["id"], name=role["name"]))
+    db.commit()
+    # Add admin user if not present
     user = db.query(models.User).filter(models.User.email == "admin@test.com").first()
     if not user:
         user = models.User(
