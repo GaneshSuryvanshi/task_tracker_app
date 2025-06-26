@@ -17,4 +17,10 @@ logging.info("Starting FastAPI app from start.py...")
 
 if __name__ == "__main__":
     logging.info("Running Uvicorn server...")
-    uvicorn.run("start:app", host="0.0.0.0", port=8000)
+    uvicorn.run(
+        "start:app",
+        host="0.0.0.0",
+        port=8000,
+        proxy_headers=True,              # <-- Add this
+        forwarded_allow_ips="*",         # <-- And this
+    )
