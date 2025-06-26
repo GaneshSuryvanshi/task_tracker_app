@@ -69,7 +69,7 @@ class Project(BaseModel):
     description: Optional[str]
     start_date: date
     end_date: date
-    owner_id: int
+    owner_id: int | None = None
     owner: Optional[UserName] = None
     class Config:
         orm_mode = True
@@ -78,14 +78,14 @@ class ProjectCreate(BaseModel):
     description: Optional[str] = None
     start_date: date
     end_date: date
-    owner_id: int
+    owner_id: int | None = None  # This allows null/None values
 
 class Task(BaseModel):
     id: int
     description: str
     due_date: date
     status: TaskStatus = TaskStatus.new
-    owner_id: int
+    owner_id: int | None = None
     project_id: int
     class Config:
         orm_mode = True
@@ -94,12 +94,5 @@ class TaskCreate(BaseModel):
     description: str
     due_date: date
     status: TaskStatus = TaskStatus.new
-    owner_id: int
+    owner_id: int | None = None  # This allows null/None values
     project_id: int
-
-class DummyUpdate(BaseModel):
-    description: Optional[str] = None
-    due_date: Optional[date] = None
-    status: Optional[TaskStatus] = None
-    owner_id: Optional[int] = None
-    project_id: Optional[int] = None
